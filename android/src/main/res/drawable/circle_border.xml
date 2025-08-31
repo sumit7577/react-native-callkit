@@ -1,0 +1,10 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+  <!-- Background Circle -->
+  <item>
+    <shape android:shape="oval">
+      <solid android:color="@android:color/white" />
+      <!-- The border color and width -->
+      <stroke android:color="@android:color/white" android:width="4dp" />
+    </shape>
+  </item>
+</layer-list>

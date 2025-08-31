@@ -1,0 +1,5 @@
+<resources>
+  <color name="custom_red">#FF0000</color>
+  <color name="theme">#FF576DEB</color>
+  <!-- Define any other custom colors here -->
+</resources>

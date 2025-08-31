@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="match_parent"
+  android:layout_height="100dp"
+  android:paddingHorizontal="13dp"
+  android:paddingTop="8dp"
+  android:paddingBottom="8dp"
+  android:background="@color/theme"
+  >
+
+
+
+  <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="8dp">
+
+    <!-- Profile image or avatar -->
+    <ImageView
+      android:id="@+id/profile_pic"
+      android:layout_width="50dp"
+      android:layout_height="50dp"
+      android:layout_gravity="center_vertical"
+      android:background="@drawable/circle_border"
+      android:clipToOutline="true"
+      android:scaleType="centerCrop"
+      android:src="@drawable/baseline_person_24"
+    />
+
+    <!-- Notification content: title, calling text, call icon -->
+    <LinearLayout
+      android:layout_width="0dp"
+      android:layout_height="match_parent"
+      android:layout_weight="1"
+      android:orientation="vertical"
+      android:gravity="center_vertical"
+      android:paddingStart="16dp">
+
+      <!-- Contact Name -->
+      <TextView
+        android:id="@+id/notification_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Mary Com"
+        android:textColor="@android:color/white"
+        android:textSize="14sp"
+        android:textStyle="bold" />
+
+      <!-- Calling status -->
+      <TextView
+        android:id="@+id/notification_calling"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="8dp"
+        android:text="Calling..."
+        android:textColor="@android:color/white"
+        android:textSize="12sp"
+        android:textStyle="bold" />
+
+    </LinearLayout>
+
+    <!-- Call action buttons: accept or decline -->
+    <LinearLayout
+      android:layout_width="wrap_content"
+      android:layout_height="match_parent"
+      android:gravity="center_vertical"
+      android:orientation="horizontal">
+
+      <!-- Accept Call button -->
+      <ImageView
+        android:id="@+id/caller_pick"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="center"
+        android:background="@drawable/circle_border"
+        android:clipToOutline="true"
+        android:layout_marginEnd="16dp"
+        android:padding="8dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/baseline_call_24"
+        android:tint="@android:color/holo_green_dark" />
+
+      <!-- Decline Call button -->
+      <ImageView
+        android:id="@+id/caller_decline"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="center"
+        android:background="@drawable/circle_border"
+        android:clipToOutline="true"
+        android:padding="8dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/baseline_call_end_24"
+        android:tint="@color/custom_red" />
+
+    </LinearLayout>
+
+  </LinearLayout>
+
+
+
+</RelativeLayout>
