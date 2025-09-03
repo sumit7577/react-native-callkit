@@ -5,26 +5,16 @@ import android.Manifest
 import android.app.Activity
 import android.app.role.RoleManager
 import android.content.Context
-import android.content.Context.ROLE_SERVICE
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
-import android.telecom.PhoneAccountHandle
 import android.telecom.TelecomManager
-import android.telecom.TelecomManager.ACTION_CHANGE_DEFAULT_DIALER
-import android.telecom.TelecomManager.EXTRA_CHANGE_DEFAULT_DIALER_PACKAGE_NAME
-import android.util.Log
 import android.util.SparseArray
-import android.widget.Toast
 import androidx.annotation.RequiresApi
-import androidx.core.app.ActivityCompat.startActivityForResult
-import androidx.core.content.ContextCompat.getSystemService
 import com.facebook.react.bridge.ActivityEventListener
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
-import com.facebook.react.bridge.ReactContextBaseJavaModule
-import com.facebook.react.bridge.ReactMethod
 import com.callkit.helpers.SimpleContactsHelper
 import com.facebook.react.bridge.ReadableArray
 import com.facebook.react.bridge.ReadableMap
@@ -38,15 +28,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 
-class CallKitHelper(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext),
-  ActivityEventListener {
+class CallKitHelper(reactContext: ReactApplicationContext) : ActivityEventListener {
 
   private val dialerResultCallbacks =SparseArray<Promise>()
   private var dialerRequestCode = 9876
-
-  override fun getName(): String {
-    return NAME
-  }
 
   init {
     CallEventRepository.initialize(reactContext)
@@ -69,8 +54,11 @@ class CallKitHelper(reactContext: ReactApplicationContext) : ReactContextBaseJav
 
 
   @RequiresApi(Build.VERSION_CODES.Q)
-  @ReactMethod
-  fun requestRole(promise: Promise) {
+  fun requestRole(
+    promise: Promise,
+    reactApplicationContext: ReactApplicationContext,
+    activity: Activity?
+  ) {
     val roleManager = reactApplicationContext.getSystemService(RoleManager::class.java)
     val telecomManager = reactApplicationContext.getSystemService(TelecomManager::class.java)
     val packageName = reactApplicationContext.packageName
@@ -85,7 +73,6 @@ class CallKitHelper(reactContext: ReactApplicationContext) : ReactContextBaseJav
       return
     }
 
-    val activity = currentActivity
     if (activity == null) {
       promise.reject("ActivityError", "No current activity")
       return
@@ -98,8 +85,12 @@ class CallKitHelper(reactContext: ReactApplicationContext) : ReactContextBaseJav
     dialerRequestCode++
   }
 
-  @ReactMethod
-  fun makeCall(phoneNumber: String, promise: Promise){
+
+  fun makeCall(
+    phoneNumber: String,
+    promise: Promise,
+    reactApplicationContext: ReactApplicationContext
+  ){
     try {
       if (phoneNumber.isEmpty()) {
         promise.reject("INVALID_NUMBER", "Phone number is missing or invalid")
@@ -118,8 +109,7 @@ class CallKitHelper(reactContext: ReactApplicationContext) : ReactContextBaseJav
     }
   }
 
-  @ReactMethod
-  fun toggleSecureNumber(value:Boolean, promise: Promise){
+  fun toggleSecureNumber(value:Boolean, promise: Promise,reactApplicationContext: ReactApplicationContext){
     try{
       val dataStore = CallSettingDataStore(context = reactApplicationContext)
       CoroutineScope(Dispatchers.IO).launch {
@@ -136,8 +126,8 @@ class CallKitHelper(reactContext: ReactApplicationContext) : ReactContextBaseJav
     }
   }
 
-  @ReactMethod
-  fun getSecureNumber(promise: Promise) {
+
+  fun getSecureNumber(promise: Promise,reactApplicationContext: ReactApplicationContext) {
     try {
       val dataStore = CallSettingDataStore(context = reactApplicationContext)
 
@@ -154,8 +144,7 @@ class CallKitHelper(reactContext: ReactApplicationContext) : ReactContextBaseJav
     }
   }
 
-  @ReactMethod
-  fun toggleVibration(value: Boolean, promise: Promise) {
+  fun toggleVibration(value: Boolean, promise: Promise,reactApplicationContext: ReactApplicationContext) {
     try {
       val dataStore = CallSettingDataStore(context = reactApplicationContext)
       CoroutineScope(Dispatchers.IO).launch {
@@ -171,8 +160,8 @@ class CallKitHelper(reactContext: ReactApplicationContext) : ReactContextBaseJav
     }
   }
 
-  @ReactMethod
-  fun getVibrationStatus(promise: Promise) {
+
+  fun getVibrationStatus(promise: Promise,reactApplicationContext: ReactApplicationContext) {
     try {
       val dataStore = CallSettingDataStore(context = reactApplicationContext)
       CoroutineScope(Dispatchers.IO).launch {
@@ -189,8 +178,12 @@ class CallKitHelper(reactContext: ReactApplicationContext) : ReactContextBaseJav
   }
 
   @RequiresApi(Build.VERSION_CODES.O)
-  @ReactMethod
-  fun forwardAllCalls(cfi: Boolean, phoneNumber: String, countryCode: String?,subscriptionId: Int ,promise: Promise){
+  fun forwardAllCalls(cfi: Boolean, phoneNumber: String,
+                      countryCode: String?,
+                      subscriptionId: Int ,
+                      promise: Promise,
+                      reactApplicationContext: ReactApplicationContext
+  ){
     try {
       setCallForwarding(reactApplicationContext, cfi, phoneNumber,countryCode, subscriptionId,promise)
     } catch (e: Exception) {
@@ -198,8 +191,8 @@ class CallKitHelper(reactContext: ReactApplicationContext) : ReactContextBaseJav
     }
   }
 
-  @ReactMethod
-  fun saveReplies(reply: String, promise: Promise) {
+
+  fun saveReplies(reply: String, promise: Promise,reactApplicationContext: ReactApplicationContext) {
     val dataStore = CallSettingDataStore(context = reactApplicationContext)
     CoroutineScope(Dispatchers.IO).launch {
       try {
@@ -210,8 +203,9 @@ class CallKitHelper(reactContext: ReactApplicationContext) : ReactContextBaseJav
       }
     }
   }
-  @ReactMethod
-  fun updateReplies(replies: ReadableArray, promise: Promise) {
+
+
+  fun updateReplies(replies: ReadableArray, promise: Promise,reactApplicationContext: ReactApplicationContext) {
     val dataStore = CallSettingDataStore(context = reactApplicationContext)
     CoroutineScope(Dispatchers.IO).launch {
       try {
@@ -227,8 +221,9 @@ class CallKitHelper(reactContext: ReactApplicationContext) : ReactContextBaseJav
       }
     }
   }
-  @ReactMethod
-  fun deleteReply(reply: String, promise: Promise) {
+
+
+  fun deleteReply(reply: String, promise: Promise,reactApplicationContext: ReactApplicationContext) {
     val dataStore = CallSettingDataStore(context = reactApplicationContext)
     CoroutineScope(Dispatchers.IO).launch {
       try {
@@ -240,8 +235,8 @@ class CallKitHelper(reactContext: ReactApplicationContext) : ReactContextBaseJav
     }
   }
 
-  @ReactMethod
-  fun getReplies(promise: Promise) {
+
+  fun getReplies(promise: Promise,reactApplicationContext: ReactApplicationContext) {
     val dataStore = CallSettingDataStore(context = reactApplicationContext)
     CoroutineScope(Dispatchers.IO).launch {
       try {
@@ -256,8 +251,8 @@ class CallKitHelper(reactContext: ReactApplicationContext) : ReactContextBaseJav
     }
   }
 
-  @ReactMethod
-  fun getAllContacts(promise: Promise) {
+
+  fun getAllContacts(promise: Promise, reactApplicationContext: ReactApplicationContext) {
     try {
       val contacts = SimpleContactsHelper(reactApplicationContext)
       val result = Arguments.createArray()
@@ -300,8 +295,9 @@ class CallKitHelper(reactContext: ReactApplicationContext) : ReactContextBaseJav
       promise.reject("GET_CONTACTS_ERROR", "Failed to fetch contacts: ${e.localizedMessage}", e)
     }
   }
-  @ReactMethod
-  fun getContactById(rawContactId: Int, promise: Promise) {
+
+
+  fun getContactById(rawContactId: Int, promise: Promise,reactApplicationContext: ReactApplicationContext) {
     ensureBackgroundThread {
       try {
         val contactHelper = ContactHelper(reactApplicationContext)
@@ -422,8 +418,13 @@ class CallKitHelper(reactContext: ReactApplicationContext) : ReactContextBaseJav
       }
     }
   }
-  @ReactMethod
-  fun createNewContact(contactMap: ReadableMap, promise: Promise){
+
+
+  fun createNewContact(
+    contactMap: ReadableMap,
+    promise: Promise,
+    reactApplicationContext: ReactApplicationContext
+  ){
     try {
       val contactHelper = ContactHelper(reactApplicationContext)
       val contact = contactHelper.readableMapToContact(contactMap)
@@ -439,8 +440,13 @@ class CallKitHelper(reactContext: ReactApplicationContext) : ReactContextBaseJav
     }
   }
 
-  @ReactMethod
-  fun updateContact(contactMap: ReadableMap, photoStatus: Int, promise: Promise) {
+
+  fun updateContact(
+    contactMap: ReadableMap,
+    photoStatus: Int,
+    promise: Promise,
+    reactApplicationContext: ReactApplicationContext
+  ) {
     try {
       val contactHelper = ContactHelper(reactApplicationContext)
       val contact = contactHelper.readableMapToContact(contactMap)
@@ -457,8 +463,12 @@ class CallKitHelper(reactContext: ReactApplicationContext) : ReactContextBaseJav
     }
   }
 
-  @ReactMethod
-  fun deleteContact(contact: ReadableMap, promise: Promise) {
+
+  fun deleteContact(
+    contact: ReadableMap,
+    promise: Promise,
+    reactApplicationContext: ReactApplicationContext
+  ) {
     ensureBackgroundThread {
       try {
         val contactHelper = ContactHelper(reactApplicationContext)
@@ -475,8 +485,9 @@ class CallKitHelper(reactContext: ReactApplicationContext) : ReactContextBaseJav
       }
     }
   }
-  @ReactMethod
-  fun isNumberBlocked(phoneNumber: String, promise: Promise) {
+
+
+  fun isNumberBlocked(phoneNumber: String, promise: Promise,reactApplicationContext:ReactApplicationContext) {
     try {
       val dataStore = CallSettingDataStore(reactApplicationContext)
       CoroutineScope(Dispatchers.IO).launch {
@@ -491,8 +502,9 @@ class CallKitHelper(reactContext: ReactApplicationContext) : ReactContextBaseJav
       promise.reject("BLOCK_CHECK_ERROR", "Failed to check if number is blocked: ${e.message}")
     }
   }
-  @ReactMethod
-  fun getBlockedNumbers(promise: Promise) {
+
+
+  fun getBlockedNumbers(promise: Promise,reactApplicationContext: ReactApplicationContext) {
     CoroutineScope(Dispatchers.IO).launch {
       try {
         val dataStore = CallSettingDataStore(reactApplicationContext.applicationContext)
@@ -504,8 +516,8 @@ class CallKitHelper(reactContext: ReactApplicationContext) : ReactContextBaseJav
     }
   }
 
-  @ReactMethod
-  fun addBlockedNumber(number: String, promise: Promise) {
+
+  fun addBlockedNumber(number: String, promise: Promise,reactApplicationContext: ReactApplicationContext) {
     CoroutineScope(Dispatchers.IO).launch {
       try {
         val dataStore = CallSettingDataStore(reactApplicationContext)
@@ -517,8 +529,8 @@ class CallKitHelper(reactContext: ReactApplicationContext) : ReactContextBaseJav
     }
   }
 
-  @ReactMethod
-  fun removeBlockedNumber(number: String, promise: Promise) {
+
+  fun removeBlockedNumber(number: String, promise: Promise,reactApplicationContext: ReactApplicationContext) {
     CoroutineScope(Dispatchers.IO).launch {
       try {
         val dataStore = CallSettingDataStore(reactApplicationContext)
@@ -530,8 +542,8 @@ class CallKitHelper(reactContext: ReactApplicationContext) : ReactContextBaseJav
     }
   }
 
-  @ReactMethod
-  fun toggleShowBlockNotification(promise: Promise) {
+
+  fun toggleShowBlockNotification(promise: Promise,reactApplicationContext: ReactApplicationContext) {
     CoroutineScope(Dispatchers.IO).launch {
       try {
         val dataStore = CallSettingDataStore(reactApplicationContext)
@@ -543,8 +555,9 @@ class CallKitHelper(reactContext: ReactApplicationContext) : ReactContextBaseJav
       }
     }
   }
-  @ReactMethod
-  fun getBlockNotificationStatus(promise: Promise) {
+
+
+  fun getBlockNotificationStatus(promise: Promise,reactApplicationContext: ReactApplicationContext) {
     try {
       val dataStore = CallSettingDataStore(reactApplicationContext)
       CoroutineScope(Dispatchers.IO).launch {
