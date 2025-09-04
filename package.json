@@ -1,7 +1,7 @@
 {
-  "name": "react-native-callkit",
+  "name": "react-native-caller",
   "version": "0.1.0",
-  "description": "raect natove callkit for android",
+  "description": "React Native module for Android that lets your app request default dialer role, initiate phone calls, and integrate with the native call system.",
   "main": "./lib/module/index.js",
   "types": "./lib/typescript/src/index.d.ts",
   "exports": {
@@ -42,8 +42,19 @@
   },
   "keywords": [
     "react-native",
-    "ios",
-    "android"
+    "react native",
+    "android",
+    "call",
+    "caller",
+    "dialer",
+    "callkit",
+    "phone",
+    "telecom",
+    "role manager",
+    "default dialer",
+    "react-native-android",
+    "voip",
+    "react-native-module"
   ],
   "repository": {
     "type": "git",
